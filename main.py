@@ -1,5 +1,53 @@
 
+# -------------------------------------------------------------------
+class Comppressed_Point:
+    def __init__(self):
+        self.elements = []
+        self.points = []
 
+    def update_elements(self , point):
+        for i in point.elements:
+            if (i not in self.elements) and (i.type != 1):
+                self.elements.append(i)
+# --------------------------------------------------------------------
+class Circuit:
+    def __init__(self , elements):
+        self.elements = elements
+        self.compressed_points = []
+
+    def is_appended(self , point):
+        for compressed in self.compressed_points:
+            if point in compressed.points:
+                return True
+        return False
+
+    def find_compressed(self , point):
+        for i in self.compressed_points:
+            if point in i.points:
+                return i
+
+    def init_circuit(self , grid):
+        for row in grid.points:
+            for point in row:
+                point.compressed = False
+
+        for row in grid.points:
+            for point in row:
+                if not point.compressed:
+                    new_compressed = Comppressed_Point()
+                    new_compressed.update_elements(point)
+                    new_compressed.points.append(point)
+                    self.compressed_points.append(new_compressed)
+
+                    neighbors = []
+                    grid.find_neighbors(point , neighbors)
+
+                    for neighbor in neighbors:
+                        new_compressed.points.append(neighbor)
+                        new_compressed.update_elements(neighbor)
+
+# --------------------------------------------------------------------- 
+# ---------------------------------------------------------------------
 class Element:
     def __init__(self , point1 , point2 , E_type , amount):
         self.point1 = point1
@@ -7,13 +55,26 @@ class Element:
         self.type = E_type
         self.amount = amount
 
+    def find_another_point(self , point):
+        if self.point1 == point:
+            return self.point2
+        if self.point2 == point:
+            return self.point1
 
+# ---------------------------------------------------------------------
 class Point:
     def __init__(self , x , y):
         self.x = x
         self.y = y
         self.elements = []
+        self.compressed = False
 
+    def has_sim(self):
+        for i in self.elements:
+            if i.type == 1:
+                return True
+        return False
+# ----------------------------------------------------------------------
 class Grid:
     def __init__(self):
         self.points = []
@@ -50,20 +111,34 @@ class Grid:
             first_point.elements.append(new_element)
             second_point.elements.append(new_element)
 
+    def find_active_points(self , active_points):
+        for i in self.points:
+            for j in i:
+                if len(j.elements) != 0:
+                    active_points.append(j)
 
+    def find_neighbors(self , point , neighbors):
+        if not point.compressed:
+            neighbors.append(point)
+            point.compressed = True
 
+        for element in point.elements:
+            if element.type == 1:
+                another_point = element.find_another_point(point)
 
-# def print_elements(grid):
-#     for i in grid.elements:
-#         print(f'{i.type} : ({i.point1.x} , {i.point1.y}) ({i.point2.x} , {i.point2.y})')
-    
-
+                if not another_point.compressed:
+                    self.find_neighbors(another_point , neighbors)
+# ---------------------------------------------------------------------------------------------
 
 grid = Grid()
-
 grid.init_points()
+grid.add_element(1 , 1 , 1 , 2 , 1 , 5)
+grid.add_element(2 , 1 , 1 , 1 , 2 , 5)
+grid.add_element(1 , 1 , 1 , 2 , 2 , 5)
 
+active_points = []
+grid.find_active_points(active_points)
 
-
-
+for i in active_points:
+    print(i.x , i.y)
 
