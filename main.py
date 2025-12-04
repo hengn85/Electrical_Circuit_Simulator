@@ -1,10 +1,11 @@
 
 
 class Element:
-    def __init__(self , point1 , point2 , E_type):
+    def __init__(self , point1 , point2 , E_type , amount):
         self.point1 = point1
         self.point2 = point2
         self.type = E_type
+        self.amount = amount
 
 
 class Point:
@@ -12,17 +13,6 @@ class Point:
         self.x = x
         self.y = y
         self.elements = []
-
-class Edge:
-    def __init__(self , node1 , node2):
-        self.node1 = node1
-        self.node2 = node2
-        self.elements = []
-
-class Node:
-    def __init__(self):
-        self.points = []
-        self.edges = []
 
 class Grid:
     def __init__(self):
@@ -51,16 +41,15 @@ class Grid:
                 if (j.x == x and j.y == y):
                     return j
 
-    def add_element(self , E_type , point1_x , point1_y , point2_x , point2_y):
-        
+    def add_element(self , E_type , point1_x , point1_y , point2_x , point2_y , amount):
         first_point = self.find_point(point1_x , point1_y)
         second_point = self.find_point(point2_x , point2_y)
-        new_element = Element(first_point , second_point , E_type)
-        self.elements.append(new_element)
-        first_point.elements.append(new_element)
-        second_point.elements.append(new_element)
+        if self.is_empty(first_point , second_point):
+            new_element = Element(first_point , second_point , E_type , amount)
+            self.elements.append(new_element)
+            first_point.elements.append(new_element)
+            second_point.elements.append(new_element)
 
-    # def find_nodes(self):
 
 
 
